@@ -7,10 +7,20 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 // vault
 import { useVaultTvl } from "@/features/vault/hooks/use-vault-tvl";
+import { useVaultApyPercentage } from "@/features/vault/hooks/use-vault-apy";
 
 export default function Home() {
-	// vault
-	const { data: tvl, isLoading: isLoadingTvl, error: errorTvl } = useVaultTvl();
+	// vault hooks
+	const {
+		data: tvlData,
+		error: errorTvl,
+		isLoading: isLoadingTvl,
+	} = useVaultTvl();
+	const {
+		data: apyData,
+		error: errorApy,
+		isLoading: isLoadingApy,
+	} = useVaultApyPercentage();
 
 	return (
 		<main className="container mx-auto px-4 py-8">
@@ -18,32 +28,51 @@ export default function Home() {
 				Veda Labs - Boring Vault
 			</h1>
 
-			{isLoadingTvl ? (
-				<Skeleton className="w-[204px] h-[45px] rounded-sm" />
-			) : null}
+			<div className="flex flex-row gap-3 items-center h-[60px] text-neutral-50 text-2xl font-semibold">
+				<div className="flex items-center gap-2">
+					<span>TVL</span>
+					{isLoadingTvl ? (
+						<Skeleton className="w-[90px] h-[30px] rounded-sm" />
+					) : null}
 
-			{errorTvl ? (
-				<p className="text-neutral-50 text-4xl font-semibold">
-					Error loading TVL
-				</p>
-			) : null}
+					{errorTvl ? <span>Error loading value</span> : null}
 
-			{!isLoadingTvl && !errorTvl ? (
-				<div className="text-neutral-50 text-4xl font-semibold">
-					TVL{" "}
-					<NumberFlow
-						willChange
-						value={tvl}
-						format={{
-							style: "currency",
-							currency: "USD",
-							notation: "compact",
-							compactDisplay: "short",
-							maximumFractionDigits: 1,
-						}}
-					/>
+					{!isLoadingTvl && !errorTvl ? (
+						<NumberFlow
+							willChange
+							value={tvlData}
+							format={{
+								style: "currency",
+								currency: "USD",
+								notation: "compact",
+								compactDisplay: "short",
+								maximumFractionDigits: 1,
+							}}
+							className="w-[90px] h-full"
+						/>
+					) : null}
 				</div>
-			) : null}
+
+				<span className="text-neutral-50">·</span>
+
+				<div className="flex items-center gap-2">
+					<span>APY</span>
+					{isLoadingApy ? (
+						<Skeleton className="w-[60px] h-[30px] rounded-sm" />
+					) : null}
+
+					{errorApy ? <span>Error loading value</span> : null}
+
+					{!isLoadingApy && !errorApy ? (
+						<NumberFlow
+							willChange
+							value={apyData}
+							format={{ style: "percent", maximumFractionDigits: 1 }}
+							className="w-[60px] h-full"
+						/>
+					) : null}
+				</div>
+			</div>
 		</main>
 	);
 }

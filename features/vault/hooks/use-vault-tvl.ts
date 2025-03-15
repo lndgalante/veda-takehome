@@ -1,9 +1,10 @@
 "use client";
+
 import { useEffect } from "react";
 import { useDebounceValue } from "usehooks-ts";
 
 // internals
-import { useVaultTotalSupply } from "./use-tvl";
+import { useVaultTotalSupply } from "./use-vault-total-supply";
 
 // wbtc
 import { getSatoshisToBtc } from "@/features/wbtc/utils/units";

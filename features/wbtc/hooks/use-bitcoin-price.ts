@@ -17,7 +17,6 @@ export function useWbtcPrice(): UseQueryResult<WbtcPrice> {
 		queryFn: async () => {
 			const response = await fetch("https://app.ether.fi/api/pricing/wbtc");
 			const data = await response.json();
-			console.log("\n ~ queryFn: ~ data:", data);
 
 			return wbtcPriceSchema.parse(data);
 		},

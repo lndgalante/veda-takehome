@@ -18,7 +18,7 @@ bun run dev
 
 # Requeriments
 - [x] See the overall TVL of the vault in USD
-- [ ] View the current APY of the vault
+- [x] View the current APY of the vault
 - [ ] Connect their (ethereum) wallet
 - [ ] View their current balance in the vault in USD
 - [ ] Deposit LBTC, wBTC, cbBTC, or eBTC
