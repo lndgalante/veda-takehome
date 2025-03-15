@@ -3,10 +3,11 @@
 	"version": "0.1.0",
 	"private": true,
 	"scripts": {
-		"dev": "next dev --turbopack",
-		"build": "next build",
+		"lint": "next lint",
 		"start": "next start",
-		"lint": "next lint"
+		"build": "next build",
+		"dev": "next dev --turbopack",
+		"clean:install": "rm -rf node_modules .next && bun pm cache rm && bun install --force"
 	},
 	"dependencies": {
 		"@number-flow/react": "^0.5.7",
@@ -21,7 +22,7 @@
 		"tailwind-merge": "^3.0.2",
 		"tailwindcss-animate": "^1.0.7",
 		"usehooks-ts": "^3.1.1",
-		"viem": "2.x",
+		"viem": "^2.23.11",
 		"wagmi": "^2.14.13",
 		"zod": "^3.24.2"
 	},
