@@ -7,8 +7,8 @@ import { useDebounceValue } from "usehooks-ts";
 import { useVaultBalanceOf } from "./use-vault-balance-of";
 
 // wbtc
-import { getSatoshisToBtc } from "@/features/wbtc/utils/units";
-import { useWbtcPrice } from "@/features/wbtc/hooks/use-bitcoin-price";
+import { getSatoshisToBtc } from "@/features/prices/utils/units";
+import { useWbtcPrice } from "@/features/prices/hooks/use-wbtc-price";
 
 export function useVaultUserBalance(address: `0x${string}` | undefined) {
 	// vault hooks
