@@ -4,6 +4,11 @@ import NumberFlow from "@number-flow/react";
 
 // ui
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 // vault
 import { useVaultTvl } from "@/features/vault/hooks/use-vault-tvl";
@@ -30,7 +35,15 @@ export default function Home() {
 
 			<div className="flex flex-row gap-3 items-center h-[60px] text-neutral-50 text-2xl font-semibold">
 				<div className="flex items-center gap-2">
-					<span>TVL</span>
+					<Tooltip>
+						<TooltipTrigger asChild>
+							<span>TVL</span>
+						</TooltipTrigger>
+						<TooltipContent side="bottom">
+							<p>Total Value Locked</p>
+						</TooltipContent>
+					</Tooltip>
+
 					{isLoadingTvl ? (
 						<Skeleton className="w-[90px] h-[30px] rounded-sm" />
 					) : null}
@@ -56,7 +69,15 @@ export default function Home() {
 				<span className="text-neutral-50">·</span>
 
 				<div className="flex items-center gap-2">
-					<span>APY</span>
+					<Tooltip>
+						<TooltipTrigger asChild>
+							<span>APY</span>
+						</TooltipTrigger>
+						<TooltipContent side="bottom">
+							<p>Annual Percentage Yield</p>
+						</TooltipContent>
+					</Tooltip>
+
 					{isLoadingApy ? (
 						<Skeleton className="w-[60px] h-[30px] rounded-sm" />
 					) : null}

@@ -7,6 +7,9 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { config } from "@/lib/wagmi";
 import { queryClient } from "@/lib/react-query";
 
+// ui
+import { TooltipProvider } from "@/components/ui/tooltip";
+
 export function RootProvider({
 	children,
 }: Readonly<{
@@ -14,7 +17,9 @@ export function RootProvider({
 }>) {
 	return (
 		<WagmiProvider config={config}>
-			<QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+			<QueryClientProvider client={queryClient}>
+				<TooltipProvider>{children}</TooltipProvider>
+			</QueryClientProvider>
 		</WagmiProvider>
 	);
 }
