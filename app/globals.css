@@ -121,3 +121,7 @@
 		@apply bg-background text-foreground;
 	}
 }
+
+[data-testid="rk-connect-button"] {
+	color: #fafafa !important;
+}

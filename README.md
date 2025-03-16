@@ -6,17 +6,25 @@
 
 # Get Started
 
-1. Install Bun (If you haven't yet)
+
+1. Create a `.env` file from `.env.template`
+```bash
+cp .env.template .env
+```
+
+2. Complete `.env` with values (ask the team for those)
+
+3. Install Bun (If you haven't yet)
 ```bash
 curl -fsSL https://bun.sh/install | bash
 ```
 
-2. Install project dependencies
+4. Install project dependencies
 ```bash
 bun install
 ```
 
-3. Run project in development-mode
+5. Run project in development-mode
 ```bash
 bun run dev
 ```
@@ -24,7 +32,7 @@ bun run dev
 # Requeriments
 - [x] See the overall TVL of the vault in USD
 - [x] View the current APY of the vault
-- [ ] Connect their (ethereum) wallet
+- [x] Connect their (ethereum) wallet
 - [ ] View their current balance in the vault in USD
 - [ ] Deposit LBTC, wBTC, cbBTC, or eBTC
 
@@ -39,7 +47,9 @@ bun run dev
 
 # Notes
 
-- For the TVL feature I have a final result of $37.3M but Ether.fi has a value of $38.4M, so I'm a bit worried where that difference is coming from, since I would like that the TVL is as accurate as possible that's why I'm reading the `totalSupply` directly from chain.
+- For the TVL feature I have a final result of `$37.3M` but Ether.fi has a value of `$38.4M`, so I'm a bit worried where that difference is coming from, since I would like that the TVL is as accurate as possible that's why I'm reading the `totalSupply` directly from chain.
+- I'm using RainbowKit as a third-party wallet connect, on top of wagmi, since IMO is the best UI/UX for connecting wallet, and for a challenge seems a right fit in order to be time-wise. (And also is being used in Veda Labs Tech to maintain consistency).
+- I'm showing the current connected chain, but only in `development mode`, and not in production.
 
 ---
 

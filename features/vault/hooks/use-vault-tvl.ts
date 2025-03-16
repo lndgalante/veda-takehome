@@ -11,14 +11,14 @@ import { getSatoshisToBtc } from "@/features/wbtc/utils/units";
 import { useWbtcPrice } from "@/features/wbtc/hooks/use-bitcoin-price";
 
 export function useVaultTvl() {
-	// vault
+	// vault hooks
 	const {
 		data: vaultTotalSupply,
 		error: errorVaultTotalSupply,
 		isLoading: isLoadingVaultTotalSupply,
 	} = useVaultTotalSupply();
 
-	// wbtc
+	// wbtc hooks
 	const {
 		data: wbtcPrice,
 		error: errorWbtcPrice,

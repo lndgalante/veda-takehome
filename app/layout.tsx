@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
+// styles
+import "@rainbow-me/rainbowkit/styles.css";
+
 // internals
 import "./globals.css";
 

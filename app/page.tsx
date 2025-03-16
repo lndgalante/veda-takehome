@@ -1,6 +1,10 @@
 "use client";
 
 import NumberFlow from "@number-flow/react";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
+
+// lib
+import { isDev } from "@/lib/is-dev";
 
 // ui
 import { Skeleton } from "@/components/ui/skeleton";
@@ -29,11 +33,18 @@ export default function Home() {
 
 	return (
 		<main className="container mx-auto px-4 py-8">
-			<h1 className="text-4xl font-bold text-neutral-50 mb-4">
-				Veda Labs - Boring Vault
-			</h1>
+			<nav className="flex flex-row justify-between items-center flex-1 mb-6 h-[44px]">
+				<h1 className="text-3xl font-bold text-neutral-50">
+					Veda Labs - Boring Vault
+				</h1>
+				<ConnectButton
+					label="Connect Wallet"
+					accountStatus="address"
+					chainStatus={isDev ? "full" : "none"}
+				/>
+			</nav>
 
-			<div className="flex flex-row gap-3 items-center h-[60px] text-neutral-50 text-2xl font-semibold">
+			<div className="flex flex-row gap-3 items-center h-[40px] text-neutral-50 text-2xl font-semibold">
 				<div className="flex items-center gap-2">
 					<Tooltip>
 						<TooltipTrigger asChild>
@@ -79,7 +90,7 @@ export default function Home() {
 					</Tooltip>
 
 					{isLoadingApy ? (
-						<Skeleton className="w-[60px] h-[30px] rounded-sm" />
+						<Skeleton className="w-[54px] h-[30px] rounded-sm" />
 					) : null}
 
 					{errorApy ? <span>Error loading value</span> : null}
@@ -89,7 +100,7 @@ export default function Home() {
 							willChange
 							value={apyData}
 							format={{ style: "percent", maximumFractionDigits: 1 }}
-							className="w-[60px] h-full"
+							className="w-[54px] h-full"
 						/>
 					) : null}
 				</div>
