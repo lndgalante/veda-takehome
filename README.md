@@ -33,7 +33,7 @@ bun run dev
 - [x] See the overall TVL of the vault in USD
 - [x] View the current APY of the vault
 - [x] Connect their (ethereum) wallet
-- [ ] View their current balance in the vault in USD
+- [x] View their current balance in the vault in USD
 - [ ] Deposit LBTC, wBTC, cbBTC, or eBTC
 
 # Follow-up

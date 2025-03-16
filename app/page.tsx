@@ -1,5 +1,6 @@
 "use client";
 
+import { useAccount } from "wagmi";
 import NumberFlow from "@number-flow/react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 
@@ -17,23 +18,37 @@ import {
 // vault
 import { useVaultTvl } from "@/features/vault/hooks/use-vault-tvl";
 import { useVaultApyPercentage } from "@/features/vault/hooks/use-vault-apy";
+import { useVaultUserBalance } from "@/features/vault/hooks/use-vault-user-balance";
+
+// constants
+const DEMO_ADDRESS_FOR_TESTING = "0xD50e208b3D89eC1b74303e3365404bD8736E5BA3";
 
 export default function Home() {
+	// wallet hooks
+	const { address } = useAccount();
+
 	// vault hooks
 	const {
 		data: tvlData,
 		error: errorTvl,
 		isLoading: isLoadingTvl,
 	} = useVaultTvl();
+
 	const {
 		data: apyData,
 		error: errorApy,
 		isLoading: isLoadingApy,
 	} = useVaultApyPercentage();
 
+	const {
+		data: userBalance,
+		error: errorUserBalance,
+		isLoading: isLoadingUserBalance,
+	} = useVaultUserBalance(DEMO_ADDRESS_FOR_TESTING);
+
 	return (
 		<main className="container mx-auto px-4 py-8">
-			<nav className="flex flex-row justify-between items-center flex-1 mb-6 h-[44px]">
+			<nav className="flex flex-row justify-between items-center flex-1 mb-3 h-[44px]">
 				<h1 className="text-3xl font-bold text-neutral-50">
 					Veda Labs - Boring Vault
 				</h1>
@@ -44,8 +59,8 @@ export default function Home() {
 				/>
 			</nav>
 
-			<div className="flex flex-row gap-3 items-center h-[40px] text-neutral-50 text-2xl font-semibold">
-				<div className="flex items-center gap-2">
+			<section className="flex flex-row gap-3 items-center h-[40px] text-neutral-50 text-2xl font-semibold mb-12">
+				<article className="flex items-center gap-2">
 					<Tooltip>
 						<TooltipTrigger asChild>
 							<span>TVL</span>
@@ -59,7 +74,16 @@ export default function Home() {
 						<Skeleton className="w-[90px] h-[30px] rounded-sm" />
 					) : null}
 
-					{errorTvl ? <span>Error loading value</span> : null}
+					{errorTvl ? (
+						<Tooltip>
+							<TooltipTrigger asChild>
+								<span>Error</span>
+							</TooltipTrigger>
+							<TooltipContent side="bottom">
+								<p>Try again later</p>
+							</TooltipContent>
+						</Tooltip>
+					) : null}
 
 					{!isLoadingTvl && !errorTvl ? (
 						<NumberFlow
@@ -75,11 +99,9 @@ export default function Home() {
 							className="w-[90px] h-full"
 						/>
 					) : null}
-				</div>
-
+				</article>
 				<span className="text-neutral-50">·</span>
-
-				<div className="flex items-center gap-2">
+				<article className="flex items-center gap-2">
 					<Tooltip>
 						<TooltipTrigger asChild>
 							<span>APY</span>
@@ -93,7 +115,16 @@ export default function Home() {
 						<Skeleton className="w-[54px] h-[30px] rounded-sm" />
 					) : null}
 
-					{errorApy ? <span>Error loading value</span> : null}
+					{errorApy ? (
+						<Tooltip>
+							<TooltipTrigger asChild>
+								<span>Error</span>
+							</TooltipTrigger>
+							<TooltipContent side="bottom">
+								<p>Try again later</p>
+							</TooltipContent>
+						</Tooltip>
+					) : null}
 
 					{!isLoadingApy && !errorApy ? (
 						<NumberFlow
@@ -103,8 +134,60 @@ export default function Home() {
 							className="w-[54px] h-full"
 						/>
 					) : null}
-				</div>
-			</div>
+				</article>
+			</section>
+
+			{address ? (
+				<section className="flex flex-row gap-3 items-center h-[40px] text-neutral-50 text-2xl font-semibold">
+					<article className="flex items-center gap-2">
+						<Tooltip>
+							<TooltipTrigger asChild>
+								<span>Vault Balance</span>
+							</TooltipTrigger>
+							<TooltipContent side="bottom">
+								<p>Amount of liquidBTC you own</p>
+							</TooltipContent>
+						</Tooltip>
+
+						{isLoadingUserBalance ? (
+							<div className="flex flex-row gap-2">
+								<Skeleton className="w-[80px] h-[30px] rounded-sm" />
+							</div>
+						) : null}
+
+						{errorUserBalance ? (
+							<Tooltip>
+								<TooltipTrigger asChild>
+									<span>Error</span>
+								</TooltipTrigger>
+								<TooltipContent side="bottom">
+									<p>Try again later</p>
+								</TooltipContent>
+							</Tooltip>
+						) : null}
+
+						{!isLoadingUserBalance && !errorUserBalance ? (
+							<Tooltip>
+								<TooltipTrigger asChild>
+									<NumberFlow
+										willChange
+										value={userBalance.fiat}
+										format={{ style: "currency", currency: "USD" }}
+									/>
+								</TooltipTrigger>
+								<TooltipContent side="bottom">
+									<NumberFlow
+										willChange
+										value={userBalance.btc}
+										format={{ maximumFractionDigits: 8 }}
+										prefix="₿"
+									/>
+								</TooltipContent>
+							</Tooltip>
+						) : null}
+					</article>
+				</section>
+			) : null}
 		</main>
 	);
 }
