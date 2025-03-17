@@ -1,10 +1,12 @@
 "use client";
 
 import { z } from "zod";
+import { Loader2 } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { useAccount } from "wagmi";
+import { useAccount, usePublicClient } from "wagmi";
+import { useConnectModal } from "@rainbow-me/rainbowkit";
 
 // lib
 import { cn } from "@/lib/utils";
@@ -35,12 +37,14 @@ import { useCbBtcBalance } from "@/features/tokens/hooks/cbbtc/use-cbbtc-balance
 import { useLbtcBalance } from "@/features/tokens/hooks/lbtc/use-lbtc-balance";
 import { useWbtcBalance } from "@/features/tokens/hooks/wbtc/use-wbtc-balance";
 import { useEbtcBalance } from "@/features/tokens/hooks/ebtc/use-ebtc-balance";
+import { useVaultTokenApprove } from "@/features/vault/hooks/use-vault-token-approve";
 
 // teller
 import { useTellerAllowingWbtc } from "@/features/teller/hooks/use-teller-allowing-wbtc";
 import { useTellerAllowingLbtc } from "@/features/teller/hooks/use-teller-allowing-lbtc";
 import { useTellerAllowingCbBtc } from "@/features/teller/hooks/use-teller-allowing-cbbtc";
 import { useTellerAllowingEbtc } from "@/features/teller/hooks/use-teller-allowing-ebtc";
+import { useTellerDepositFunction } from "@/features/teller/hooks/use-teller-deposit";
 
 /*
 Last requirement:
@@ -76,8 +80,13 @@ const WBTC_DEMO_ADDRESS_FOR_TESTING =
 	"0x2078f336Fdd260f708BEc4a20c82b063274E1b23";
 
 export function DepositForm() {
-	// wallet hooks
-	const { address } = useAccount();
+	// wagmi hooks
+	const publicClient = usePublicClient();
+	const { address: walletAddress, isConnected: isWalletConnected } =
+		useAccount();
+
+	// rainbowkit hooks
+	const { openConnectModal } = useConnectModal();
 
 	// form hooks
 	const form = useForm<z.infer<typeof formSchema>>({
@@ -88,18 +97,20 @@ export function DepositForm() {
 		},
 	});
 
-	// token hooks - TODO: Remember to replace the DEMO_ADDRESS_FOR_TESTING with the user's address
-	const { data: wbtcBalance, isLoading: isWbtcBalanceLoading } = useWbtcBalance(
-		WBTC_DEMO_ADDRESS_FOR_TESTING,
-	);
+	// token hooks
+	const writeContractVaultTokenApproveFunction = useVaultTokenApprove();
+
+	const { data: wbtcBalance, isLoading: isWbtcBalanceLoading } =
+		useWbtcBalance(walletAddress);
 	const { data: lbtcBalance, isLoading: isLbtcBalanceLoading } =
-		useLbtcBalance(address);
+		useLbtcBalance(walletAddress);
 	const { data: ebtcBalance, isLoading: isEbtcBalanceLoading } =
-		useEbtcBalance(address);
+		useEbtcBalance(walletAddress);
 	const { data: cbtcBalance, isLoading: isCbtcBalanceLoading } =
-		useCbBtcBalance(address);
+		useCbBtcBalance(walletAddress);
 
 	// teller hooks
+	const writeContractTellerDepositFunction = useTellerDepositFunction();
 	const { data: tellerAllowingWbtc, isLoading: isTellerAllowingWbtcLoading } =
 		useTellerAllowingWbtc();
 	const { data: tellerAllowingLbtc, isLoading: isTellerAllowingLbtcLoading } =
@@ -124,12 +135,19 @@ export function DepositForm() {
 		[BTC_DERIVATED_TOKENS.EBTC.address]: tellerAllowingEbtc?.[0] === true,
 	};
 
-	const tokenValue = form.watch("token");
+	const tokenDerivedDecimals = {
+		[BTC_DERIVATED_TOKENS.WBTC.address]: BTC_DERIVATED_TOKENS.WBTC.decimals,
+		[BTC_DERIVATED_TOKENS.LBTC.address]: BTC_DERIVATED_TOKENS.LBTC.decimals,
+		[BTC_DERIVATED_TOKENS.CBBTC.address]: BTC_DERIVATED_TOKENS.CBBTC.decimals,
+		[BTC_DERIVATED_TOKENS.EBTC.address]: BTC_DERIVATED_TOKENS.EBTC.decimals,
+	};
+
+	const tokenAddressValue = form.watch("token");
 	const amountValue = form.watch("amount");
 
 	const isAmountBiggerThanWalletTokenBalance =
 		Number(amountValue) >
-		Number(tokenDerivedBalances[tokenValue as `0x${string}`]?.formatted);
+		Number(tokenDerivedBalances[tokenAddressValue as `0x${string}`]?.formatted);
 
 	const isLoadingData =
 		isWbtcBalanceLoading ||
@@ -142,46 +160,111 @@ export function DepositForm() {
 		isTellerAllowingEbtcLoading;
 
 	// handlers
-	function onSubmit(values: z.infer<typeof formSchema>) {
-		// 1. Check if the amount is valid
-		const { amount, token } = values;
-		const tokenDerivedBalance = tokenDerivedBalances[token as `0x${string}`];
+	async function onSubmit(values: z.infer<typeof formSchema>) {
+		try {
+			// 1. Check if user wallet is connected
+			if (!isWalletConnected && openConnectModal) {
+				openConnectModal();
+				return;
+			}
 
-		if (Number(amount) <= 0) {
-			return toast.error("Amount should be greater than 0");
-		}
+			// 2. Check if public client is connected
+			if (!publicClient) {
+				return toast.error("Public client is not connected");
+			}
 
-		if (Number(amount) > Number(tokenDerivedBalance?.formatted)) {
-			return toast.error("Amount is bigger than the token balance");
-		}
+			// 3. Check if the amount is valid
+			const { amount, token } = values;
 
-		// 2. Check if the teller is allowing the deposit of the selected token
-		if (
-			token === BTC_DERIVATED_TOKENS.WBTC.address &&
-			!tokenDerivedAllowDeposit[BTC_DERIVATED_TOKENS.WBTC.address]
-		) {
-			return toast.error("Vault is not allowing wBTC deposits");
-		}
+			const tokenDerivedBalance = tokenDerivedBalances[token as `0x${string}`];
+			const tokenDerivedDecimal = tokenDerivedDecimals[token as `0x${string}`];
 
-		if (
-			token === BTC_DERIVATED_TOKENS.LBTC.address &&
-			!tokenDerivedAllowDeposit[BTC_DERIVATED_TOKENS.LBTC.address]
-		) {
-			return toast.error("Vault is not allowing lBTC deposits");
-		}
+			if (Number(amount) <= 0) {
+				return toast.error("Amount should be greater than 0");
+			}
 
-		if (
-			token === BTC_DERIVATED_TOKENS.CBBTC.address &&
-			!tokenDerivedAllowDeposit[BTC_DERIVATED_TOKENS.CBBTC.address]
-		) {
-			return toast.error("Vault is not allowing cbBTC deposits");
-		}
+			if (Number(amount) > Number(tokenDerivedBalance?.formatted)) {
+				return toast.error("Amount is bigger than the token balance");
+			}
 
-		if (
-			token === BTC_DERIVATED_TOKENS.EBTC.address &&
-			!tokenDerivedAllowDeposit[BTC_DERIVATED_TOKENS.EBTC.address]
-		) {
-			return toast.error("Vault is not allowing eBTC deposits");
+			// 4. Check if the teller is allowing the deposit of the selected token
+			if (
+				token === BTC_DERIVATED_TOKENS.WBTC.address &&
+				!tokenDerivedAllowDeposit[BTC_DERIVATED_TOKENS.WBTC.address]
+			) {
+				return toast.error("Vault is not allowing wBTC deposits");
+			}
+
+			if (
+				token === BTC_DERIVATED_TOKENS.LBTC.address &&
+				!tokenDerivedAllowDeposit[BTC_DERIVATED_TOKENS.LBTC.address]
+			) {
+				return toast.error("Vault is not allowing lBTC deposits");
+			}
+
+			if (
+				token === BTC_DERIVATED_TOKENS.CBBTC.address &&
+				!tokenDerivedAllowDeposit[BTC_DERIVATED_TOKENS.CBBTC.address]
+			) {
+				return toast.error("Vault is not allowing cbBTC deposits");
+			}
+
+			if (
+				token === BTC_DERIVATED_TOKENS.EBTC.address &&
+				!tokenDerivedAllowDeposit[BTC_DERIVATED_TOKENS.EBTC.address]
+			) {
+				return toast.error("Vault is not allowing eBTC deposits");
+			}
+
+			// 5. Approve the vault to spend the token
+			const approvalHash = await writeContractVaultTokenApproveFunction({
+				amount: amountValue,
+				decimals: tokenDerivedDecimal,
+				address: tokenAddressValue as `0x${string}`,
+			});
+
+			// 6. Wait for approval hash to be confirmed
+			const approvalHashPromise = publicClient.waitForTransactionReceipt({
+				hash: approvalHash,
+			});
+
+			toast.promise(approvalHashPromise, {
+				loading: "Approving token access...",
+				success: "Token access approved successfully",
+				error: "Failed to approve token access",
+				descriptionClassName: "text-neutral-950",
+			});
+
+			await approvalHashPromise;
+
+			// 7. Deposit the token
+			const depositHash = await writeContractTellerDepositFunction({
+				amount: amountValue,
+				decimals: tokenDerivedDecimal,
+				address: tokenAddressValue as `0x${string}`,
+			});
+
+			// 8. Wait for deposit hash to be confirmed
+			const depositHashPromise = publicClient.waitForTransactionReceipt({
+				hash: depositHash,
+			});
+
+			toast.promise(depositHashPromise, {
+				loading: "Depositing tokens to vault...",
+				success: "Tokens successfully deposited to vault",
+				error: "Failed to deposit tokens to vault",
+				descriptionClassName: "text-neutral-950",
+			});
+
+			await depositHashPromise;
+
+			form.reset();
+		} catch (error) {
+			console.log("\n ~ onSubmit ~ error:", error);
+
+			toast.error("Error", {
+				description: "An error occurred while depositing the token",
+			});
 		}
 	}
 
@@ -199,15 +282,10 @@ export function DepositForm() {
 									<FormControl>
 										<Input
 											{...field}
-											value={field.value === "0" ? "" : field.value}
 											placeholder="0"
 											type="string"
 											onChange={(event) => {
 												const { value } = event.target;
-
-												if (Number.isNaN(Number(value))) {
-													return;
-												}
 
 												field.onChange(value);
 											}}
@@ -270,8 +348,19 @@ export function DepositForm() {
 						/>
 					</div>
 
-					<Button type="submit" variant="secondary" disabled={isLoadingData}>
-						{isLoadingData ? "Loading..." : "Submit"}
+					<Button
+						type="submit"
+						variant="secondary"
+						disabled={isLoadingData || form.formState.isSubmitting}
+					>
+						{isLoadingData ? "Loading..." : null}
+						{form.formState.isSubmitting ? (
+							<div className="flex flex-row items-center gap-2">
+								<Loader2 className="h-4 w-4 animate-spin" />
+								<span>Processing...</span>
+							</div>
+						) : null}
+						{!isLoadingData && !form.formState.isSubmitting ? "Submit" : null}
 					</Button>
 				</form>
 			</Form>

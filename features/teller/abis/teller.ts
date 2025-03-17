@@ -1,4 +1,4 @@
-export const tellerAbi = [
+export const TELLER_ABI = [
 	{
 		inputs: [
 			{ internalType: "address", name: "_owner", type: "address" },

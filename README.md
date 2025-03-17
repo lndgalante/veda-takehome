@@ -34,7 +34,7 @@ bun run dev
 - [x] View the current APY of the vault
 - [x] Connect their (ethereum) wallet
 - [x] View their current balance in the vault in USD
-- [ ] Deposit LBTC, wBTC, cbBTC, or eBTC
+- [x] Deposit LBTC, wBTC, cbBTC, or eBTC
 
 # Follow-up
 - [ ] Great UI/UX
@@ -47,6 +47,7 @@ bun run dev
 
 # Notes
 
+- Based on the time I had since I started on a Saturday, I follow an approach where I wanted to give a balanced quality of code and UI/UX.
 - For the TVL feature I have a final result of `$37.3M` but Ether.fi has a value of `$38.4M`, so I'm a bit worried where that difference is coming from, since I would like that the TVL is as accurate as possible that's why I'm reading the `totalSupply` directly from chain.
 - I'm using RainbowKit as a third-party wallet connect, on top of wagmi, since IMO is the best UI/UX for connecting wallet, and for a challenge seems a right fit in order to be time-wise. (And also is being used in Veda Labs Tech to maintain consistency).
 - I'm showing the current connected chain, but only in `development mode`, and not in production.

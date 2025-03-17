@@ -22,11 +22,8 @@ import { useVaultApyPercentage } from "@/features/vault/hooks/use-vault-apy";
 import { useVaultUserBalance } from "@/features/vault/hooks/use-vault-user-balance";
 import { DepositForm } from "@/features/vault/components/deposit-form";
 
-// constants
-const DEMO_ADDRESS_FOR_TESTING = "0xD50e208b3D89eC1b74303e3365404bD8736E5BA3";
-
 export default function Home() {
-	// wallet hooks
+	// wagmi hooks
 	const { address, isConnected } = useAccount();
 
 	// vault hooks
@@ -42,12 +39,11 @@ export default function Home() {
 		isLoading: isLoadingApy,
 	} = useVaultApyPercentage();
 
-	// TODO: Remember to replace the DEMO_ADDRESS_FOR_TESTING with the user's address
 	const {
 		data: userBalance,
 		error: errorUserBalance,
 		isLoading: isLoadingUserBalance,
-	} = useVaultUserBalance(DEMO_ADDRESS_FOR_TESTING);
+	} = useVaultUserBalance(address);
 
 	return (
 		<main className="container mx-auto px-4 py-8">
@@ -149,7 +145,7 @@ export default function Home() {
 				<article className="flex items-center gap-2">
 					<Tooltip>
 						<TooltipTrigger asChild>
-							<span>Vault Balance</span>
+							<span>Your Balance:</span>
 						</TooltipTrigger>
 						<TooltipContent side="bottom">
 							<p>Amount of liquidBTC you own</p>

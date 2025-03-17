@@ -15,7 +15,7 @@ export const BTC_DERIVATED_TOKENS = {
 		decimals: 8,
 	},
 	EBTC: {
-		address: "0x2FD41f516fAc94Ed08e156F489f56cA3A80b04D0" as `0x${string}`,
+		address: "0x657e8C867D8B37dCC18fA4Caead9C45EB088C642" as `0x${string}`,
 		label: "eBTC",
 		decimals: 8,
 	},
