@@ -11,32 +11,30 @@ import "./globals.css";
 import { RootProvider } from "@/providers/root";
 
 const geistSans = Geist({
-	variable: "--font-geist-sans",
-	subsets: ["latin"],
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
 });
 
 const geistMono = Geist_Mono({
-	variable: "--font-geist-mono",
-	subsets: ["latin"],
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-	title: "Veda Vault",
-	description: "Get your yield on Bitcoin tokens",
+  title: "Veda Vault",
+  description: "Get yield on your BTC derived tokens",
 };
 
 export default function RootLayout({
-	children,
+  children,
 }: Readonly<{
-	children: React.ReactNode;
+  children: React.ReactNode;
 }>) {
-	return (
-		<html lang="en">
-			<body
-				className={`${geistSans.variable} ${geistMono.variable} antialiased bg-neutral-900`}
-			>
-				<RootProvider>{children}</RootProvider>
-			</body>
-		</html>
-	);
+  return (
+    <html lang="en">
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-neutral-900`}>
+        <RootProvider>{children}</RootProvider>
+      </body>
+    </html>
+  );
 }

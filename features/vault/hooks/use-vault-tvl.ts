@@ -7,45 +7,41 @@ import { useDebounceValue } from "usehooks-ts";
 import { useVaultTotalSupply } from "./use-vault-total-supply";
 
 // tokens
-import { getSatoshisToBtc } from "@/features/tokens/utils/units";
 import { useWbtcPrice } from "@/features/tokens/hooks/wbtc/use-wbtc-price";
+import { getSatoshisToBtc } from "@/features/tokens/utils/units";
 
 export function useVaultTvl() {
-	// vault hooks
-	const {
-		data: vaultTotalSupply,
-		error: errorVaultTotalSupply,
-		isLoading: isLoadingVaultTotalSupply,
-	} = useVaultTotalSupply();
+  // vault hooks
+  const {
+    data: vaultTotalSupply,
+    error: errorVaultTotalSupply,
+    isLoading: isLoadingVaultTotalSupply,
+  } = useVaultTotalSupply();
 
-	// wbtc hooks
-	const {
-		data: wbtcPrice,
-		error: errorWbtcPrice,
-		isLoading: isWbtcPriceLoading,
-	} = useWbtcPrice();
+  // wbtc hooks
+  const { data: wbtcPrice, error: errorWbtcPrice, isLoading: isWbtcPriceLoading } = useWbtcPrice();
 
-	// debounce hooks
-	const [wbtcFiatValue, setWbtcFiatValue] = useDebounceValue(0, 400);
+  // debounce hooks
+  const [wbtcFiatValue, setWbtcFiatValue] = useDebounceValue(0, 400);
 
-	// effects
-	useEffect(
-		function debounceWbtcFiatValue() {
-			const btcValue = getSatoshisToBtc(vaultTotalSupply ?? BigInt(0));
-			const wbtcFiatValue = btcValue * (wbtcPrice?.price_usd ?? 0);
+  // effects
+  useEffect(
+    function debounceWbtcFiatValue() {
+      const btcValue = getSatoshisToBtc(vaultTotalSupply ?? BigInt(0));
+      const wbtcFiatValue = btcValue * (wbtcPrice?.price_usd ?? 0);
 
-			setWbtcFiatValue(wbtcFiatValue);
-		},
-		[vaultTotalSupply, wbtcPrice, setWbtcFiatValue],
-	);
+      setWbtcFiatValue(wbtcFiatValue);
+    },
+    [vaultTotalSupply, wbtcPrice, setWbtcFiatValue],
+  );
 
-	// constants
-	const errorTvl = errorVaultTotalSupply || errorWbtcPrice;
-	const isLoadingTvl = isLoadingVaultTotalSupply || isWbtcPriceLoading;
+  // constants
+  const errorTvl = errorVaultTotalSupply || errorWbtcPrice;
+  const isLoadingTvl = isLoadingVaultTotalSupply || isWbtcPriceLoading;
 
-	return {
-		error: errorTvl,
-		data: wbtcFiatValue,
-		isLoading: isLoadingTvl,
-	};
+  return {
+    error: errorTvl,
+    data: wbtcFiatValue,
+    isLoading: isLoadingTvl,
+  };
 }

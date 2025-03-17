@@ -1,3 +1,5 @@
+import { formatUnits } from "viem";
+
 export function getSatoshisToBtc(satoshis: bigint): number {
-	return Number(satoshis) / 10 ** 8;
+  return Number(formatUnits(satoshis, 8));
 }
