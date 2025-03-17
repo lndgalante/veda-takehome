@@ -100,14 +100,26 @@ export function DepositForm() {
 	// token hooks
 	const writeContractVaultTokenApproveFunction = useVaultTokenApprove();
 
-	const { data: wbtcBalance, isLoading: isWbtcBalanceLoading } =
-		useWbtcBalance(walletAddress);
-	const { data: lbtcBalance, isLoading: isLbtcBalanceLoading } =
-		useLbtcBalance(walletAddress);
-	const { data: ebtcBalance, isLoading: isEbtcBalanceLoading } =
-		useEbtcBalance(walletAddress);
-	const { data: cbtcBalance, isLoading: isCbtcBalanceLoading } =
-		useCbBtcBalance(walletAddress);
+	const {
+		data: wbtcBalance,
+		isLoading: isWbtcBalanceLoading,
+		refetch: refetchWbtcBalance,
+	} = useWbtcBalance(walletAddress);
+	const {
+		data: lbtcBalance,
+		isLoading: isLbtcBalanceLoading,
+		refetch: refetchLbtcBalance,
+	} = useLbtcBalance(walletAddress);
+	const {
+		data: ebtcBalance,
+		isLoading: isEbtcBalanceLoading,
+		refetch: refetchEbtcBalance,
+	} = useEbtcBalance(walletAddress);
+	const {
+		data: cbtcBalance,
+		isLoading: isCbtcBalanceLoading,
+		refetch: refetchCbtcBalance,
+	} = useCbBtcBalance(walletAddress);
 
 	// teller hooks
 	const writeContractTellerDepositFunction = useTellerDepositFunction();
@@ -257,6 +269,22 @@ export function DepositForm() {
 			});
 
 			await depositHashPromise;
+
+			if (token === BTC_DERIVATED_TOKENS.WBTC.address) {
+				refetchWbtcBalance();
+			}
+
+			if (token === BTC_DERIVATED_TOKENS.LBTC.address) {
+				refetchLbtcBalance();
+			}
+
+			if (token === BTC_DERIVATED_TOKENS.CBBTC.address) {
+				refetchCbtcBalance();
+			}
+
+			if (token === BTC_DERIVATED_TOKENS.EBTC.address) {
+				refetchEbtcBalance();
+			}
 
 			form.reset();
 		} catch (error) {

@@ -15,7 +15,9 @@ export function useCbbtcPrice(): UseQueryResult<CbbtcPrice> {
 	return useQuery({
 		queryKey: ["cbbtc-price"],
 		queryFn: async () => {
-			const response = await fetch("https://app.ether.fi/api/pricing/cbbtc");
+			const response = await fetch(
+				"https://cors-anywhere.herokuapp.com/https://app.ether.fi/api/pricing/cbbtc",
+			);
 			const data = await response.json();
 
 			return cbbtcPriceSchema.parse(data);

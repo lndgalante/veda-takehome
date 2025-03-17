@@ -15,7 +15,9 @@ export function useWbtcPrice(): UseQueryResult<WbtcPrice> {
 	return useQuery({
 		queryKey: ["wbtc-price"],
 		queryFn: async () => {
-			const response = await fetch("https://app.ether.fi/api/pricing/wbtc");
+			const response = await fetch(
+				"https://cors-anywhere.herokuapp.com/https://app.ether.fi/api/pricing/wbtc",
+			);
 			const data = await response.json();
 
 			return wbtcPriceSchema.parse(data);

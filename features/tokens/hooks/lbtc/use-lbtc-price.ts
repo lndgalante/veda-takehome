@@ -15,7 +15,9 @@ export function useLbtcPrice(): UseQueryResult<LbtcPrice> {
 	return useQuery({
 		queryKey: ["lbtc-price"],
 		queryFn: async () => {
-			const response = await fetch("https://app.ether.fi/api/pricing/lbtc");
+			const response = await fetch(
+				"https://cors-anywhere.herokuapp.com/https://app.ether.fi/api/pricing/lbtc",
+			);
 			const data = await response.json();
 
 			return lbtcPriceSchema.parse(data);

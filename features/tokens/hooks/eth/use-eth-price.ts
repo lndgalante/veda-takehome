@@ -15,7 +15,9 @@ export function useEthPrice(): UseQueryResult<EthPrice> {
 	return useQuery({
 		queryKey: ["eth-price"],
 		queryFn: async () => {
-			const response = await fetch("https://app.ether.fi/api/pricing/eth");
+			const response = await fetch(
+				"https://cors-anywhere.herokuapp.com/https://app.ether.fi/api/pricing/eth",
+			);
 			const data = await response.json();
 
 			return ethPriceSchema.parse(data);
