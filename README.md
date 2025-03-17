@@ -2,7 +2,7 @@
 
 ## Play with it now!
 
-[Vercel Deployment Link](https://veda-vault.vercel.app/)
+[Vercel Deployment Link](https://veda-vault.vercel.app)
 
 ## Get Started
 
@@ -47,11 +47,12 @@ bun run dev
 
 ## Notes
 
-- Based on the time I had since I started on a Saturday, I follow an approach where I wanted to give a balanced quality of code and UI/UX.
+- Based on the time I had in hands, since I started on a Saturday, I follow a balanced approach where I wanted to output as much quality of code and UI/UX, and prioritizing the primary requirements.
 - For the TVL feature I have a final result of `$37.3M` but Ether.fi has a value of `$38.4M`, so I'm a bit worried where that difference is coming from, since I would like that the TVL is as accurate as possible that's why I'm reading the `totalSupply` directly from chain.
 - I'm using RainbowKit as a third-party wallet connect, on top of wagmi, since IMO is the best UI/UX for connecting wallet, and for a challenge seems a right fit in order to be time-wise. (And also is being used in Veda Labs Tech to maintain consistency).
-- I'm showing the current connected chain, but only in `development mode`, and not in production.
+- I'm showing the current connected chain, but only in `development mode`, and not in production, perfect to switch to Sepolia or any other testnet network to do tests in dev mode.
 - I display the input amount in red if the value is bigger than the selected token (i.e. user inserts 18 in the input amount but their WBTC balance in 17.2, then the text will be shown in red)
+
 
 ---
 
