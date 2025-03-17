@@ -11,7 +11,7 @@ const cbbtcPriceSchema = z.object({
 // types
 type CbbtcPrice = z.infer<typeof cbbtcPriceSchema>;
 
-export function useCbbtcPrice(): UseQueryResult<CbbtcPrice> {
+export function useCbBtcPrice(): UseQueryResult<CbbtcPrice> {
   return useQuery({
     queryKey: ["cbbtc-price"],
     queryFn: async () => {

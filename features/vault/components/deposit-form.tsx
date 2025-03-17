@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { Loader2 } from "lucide-react";
@@ -16,6 +17,14 @@ import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 // vault
 import { useVaultTokenApprove } from "@/features/vault/hooks/use-vault-token-approve";
@@ -34,6 +43,10 @@ import { useEbtcBalance } from "@/features/tokens/hooks/ebtc/use-ebtc-balance";
 import { useLbtcBalance } from "@/features/tokens/hooks/lbtc/use-lbtc-balance";
 import { useWbtcBalance } from "@/features/tokens/hooks/wbtc/use-wbtc-balance";
 
+import { useWbtcPrice } from "@/features/tokens/hooks/wbtc/use-wbtc-price";
+import { useLbtcPrice } from "@/features/tokens/hooks/lbtc/use-lbtc-price";
+import { useCbBtcPrice } from "@/features/tokens/hooks/cbbtc/use-cbbtc-price";
+
 // schemas
 const formSchema = z.object({
   amount: z.string().min(0, {
@@ -50,6 +63,9 @@ type Props = {
 };
 
 export function DepositForm({ refetchUserBalance }: Props) {
+  // react hooks
+  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+
   // wagmi hooks
   const publicClient = usePublicClient();
   const { address: walletAddress, isConnected: isWalletConnected } = useAccount();
@@ -90,6 +106,10 @@ export function DepositForm({ refetchUserBalance }: Props) {
     refetch: refetchCbtcBalance,
   } = useCbBtcBalance(walletAddress);
 
+  const { data: wbtcPrice } = useWbtcPrice();
+  const { data: lbtcPrice } = useLbtcPrice();
+  const { data: cbtcPrice } = useCbBtcPrice();
+
   // teller hooks
   const writeContractTellerDepositFunction = useTellerDepositFunction();
   const { data: tellerAllowingWbtc, isLoading: isTellerAllowingWbtcLoading } = useTellerAllowingWbtc();
@@ -98,6 +118,19 @@ export function DepositForm({ refetchUserBalance }: Props) {
   const { data: tellerAllowingEbtc, isLoading: isTellerAllowingEbtcLoading } = useTellerAllowingEbtc();
 
   // constants
+  const tokenDerivedPrices = {
+    [BTC_DERIVATED_TOKENS.WBTC.address]: wbtcPrice,
+    [BTC_DERIVATED_TOKENS.LBTC.address]: lbtcPrice,
+    [BTC_DERIVATED_TOKENS.CBBTC.address]: cbtcPrice,
+  };
+
+  const tokenDerivedLabels = {
+    [BTC_DERIVATED_TOKENS.WBTC.address]: BTC_DERIVATED_TOKENS.WBTC.label,
+    [BTC_DERIVATED_TOKENS.LBTC.address]: BTC_DERIVATED_TOKENS.LBTC.label,
+    [BTC_DERIVATED_TOKENS.CBBTC.address]: BTC_DERIVATED_TOKENS.CBBTC.label,
+    [BTC_DERIVATED_TOKENS.EBTC.address]: BTC_DERIVATED_TOKENS.EBTC.label,
+  };
+
   const tokenDerivedBalances = {
     [BTC_DERIVATED_TOKENS.WBTC.address]: wbtcBalance,
     [BTC_DERIVATED_TOKENS.LBTC.address]: lbtcBalance,
@@ -125,6 +158,9 @@ export function DepositForm({ refetchUserBalance }: Props) {
   const isAmountBiggerThanWalletTokenBalance =
     Number(amountValue) > Number(tokenDerivedBalances[tokenAddressValue as `0x${string}`]?.formatted);
 
+  const tokenDerivedPrice = tokenDerivedPrices[tokenAddressValue as `0x${string}`];
+  const tokenDerivedLabel = tokenDerivedLabels[tokenAddressValue as `0x${string}`];
+
   const isLoadingData =
     isWbtcBalanceLoading ||
     isLbtcBalanceLoading ||
@@ -136,8 +172,15 @@ export function DepositForm({ refetchUserBalance }: Props) {
     isTellerAllowingEbtcLoading;
 
   // handlers
+  function handleToggleDialog(): void {
+    setIsDialogOpen((previousIsDialogOpen) => !previousIsDialogOpen);
+  }
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
+      // 0. Close dialog
+      handleToggleDialog();
+
       // 1. Check if user wallet is connected
       if (!isWalletConnected && openConnectModal) {
         openConnectModal();
@@ -318,7 +361,17 @@ export function DepositForm({ refetchUserBalance }: Props) {
             />
           </div>
 
-          <Button type="submit" variant="secondary" disabled={isLoadingData || form.formState.isSubmitting}>
+          <Button
+            variant="secondary"
+            type="button"
+            onClick={handleToggleDialog}
+            disabled={
+              isLoadingData ||
+              form.formState.isSubmitting ||
+              Number(amountValue) <= 0 ||
+              isAmountBiggerThanWalletTokenBalance
+            }
+          >
             {isLoadingData ? "Loading..." : null}
             {form.formState.isSubmitting ? (
               <div className="flex flex-row items-center gap-2">
@@ -328,6 +381,41 @@ export function DepositForm({ refetchUserBalance }: Props) {
             ) : null}
             {!isLoadingData && !form.formState.isSubmitting ? "Submit" : null}
           </Button>
+
+          <Dialog open={isDialogOpen} onOpenChange={handleToggleDialog}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Confirm Deposit</DialogTitle>
+                <DialogDescription asChild>
+                  <div className="space-y-2">
+                    <p>
+                      You are depositing{" "}
+                      <span className="font-medium">
+                        {amountValue} {tokenDerivedLabel}{" "}
+                        {tokenDerivedPrice ? `(~ $${Number(amountValue) * tokenDerivedPrice?.price_usd})` : null}
+                      </span>{" "}
+                      to the vault. Please confirm to continue.
+                    </p>
+                    <p>This action cannot be undone. This will permanently deposit the selected token to the vault.</p>
+                  </div>
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <Button variant="secondary" onClick={handleToggleDialog}>
+                  Cancel
+                </Button>
+                <Button
+                  variant="default"
+                  type="submit"
+                  onClick={() => {
+                    form.handleSubmit(onSubmit)();
+                  }}
+                >
+                  Confirm
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </form>
       </Form>
     </div>
