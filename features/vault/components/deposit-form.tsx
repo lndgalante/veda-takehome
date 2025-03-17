@@ -8,6 +8,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { useAccount, usePublicClient } from "wagmi";
 import { z } from "zod";
+import { useReward } from "react-rewards";
 
 // lib
 import { cn } from "@/lib/utils";
@@ -66,6 +67,9 @@ type Props = {
 export function DepositForm({ refetchUserBalance }: Props) {
   // react hooks
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+
+  // reward hooks
+  const { reward } = useReward("submit-btn", "confetti");
 
   // wagmi hooks
   const publicClient = usePublicClient();
@@ -311,6 +315,9 @@ export function DepositForm({ refetchUserBalance }: Props) {
 
       // 11. Reset form
       form.reset();
+
+      // 12. Trigger reward
+      reward();
     } catch (error) {
       console.log("\n ~ onSubmit ~ error:", error);
       toast.error("Error", {
@@ -385,6 +392,7 @@ export function DepositForm({ refetchUserBalance }: Props) {
           <Button
             variant="secondary"
             type="button"
+            id="submit-btn"
             onClick={handleToggleDialog}
             disabled={
               isLoadingData ||
