@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { Loader2 } from "lucide-react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { useAccount, usePublicClient } from "wagmi";
@@ -14,9 +14,6 @@ import { cn } from "@/lib/utils";
 
 // ui
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -25,6 +22,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 // vault
 import { useVaultTokenApprove } from "@/features/vault/hooks/use-vault-token-approve";
@@ -43,9 +43,10 @@ import { useEbtcBalance } from "@/features/tokens/hooks/ebtc/use-ebtc-balance";
 import { useLbtcBalance } from "@/features/tokens/hooks/lbtc/use-lbtc-balance";
 import { useWbtcBalance } from "@/features/tokens/hooks/wbtc/use-wbtc-balance";
 
-import { useWbtcPrice } from "@/features/tokens/hooks/wbtc/use-wbtc-price";
-import { useLbtcPrice } from "@/features/tokens/hooks/lbtc/use-lbtc-price";
 import { useCbBtcPrice } from "@/features/tokens/hooks/cbbtc/use-cbbtc-price";
+import { useEbtcPrice } from "@/features/tokens/hooks/ebtc/use-ebtc-price";
+import { useLbtcPrice } from "@/features/tokens/hooks/lbtc/use-lbtc-price";
+import { useWbtcPrice } from "@/features/tokens/hooks/wbtc/use-wbtc-price";
 
 // schemas
 const formSchema = z.object({
@@ -82,9 +83,10 @@ export function DepositForm({ refetchUserBalance }: Props) {
     },
   });
 
-  // token hooks
+  // token hooks - writes
   const writeContractVaultTokenApproveFunction = useVaultTokenApprove();
 
+  // token hooks - balances
   const {
     data: wbtcBalance,
     isLoading: isWbtcBalanceLoading,
@@ -106,12 +108,16 @@ export function DepositForm({ refetchUserBalance }: Props) {
     refetch: refetchCbtcBalance,
   } = useCbBtcBalance(walletAddress);
 
+  // token hooks - prices
   const { data: wbtcPrice } = useWbtcPrice();
   const { data: lbtcPrice } = useLbtcPrice();
   const { data: cbtcPrice } = useCbBtcPrice();
+  const { data: ebtcPrice } = useEbtcPrice();
 
-  // teller hooks
+  // teller hooks - writes
   const writeContractTellerDepositFunction = useTellerDepositFunction();
+
+  // teller hooks - reads
   const { data: tellerAllowingWbtc, isLoading: isTellerAllowingWbtcLoading } = useTellerAllowingWbtc();
   const { data: tellerAllowingLbtc, isLoading: isTellerAllowingLbtcLoading } = useTellerAllowingLbtc();
   const { data: tellerAllowingCbBtc, isLoading: isTellerAllowingCbBtcLoading } = useTellerAllowingCbBtc();
@@ -122,6 +128,7 @@ export function DepositForm({ refetchUserBalance }: Props) {
     [BTC_DERIVATED_TOKENS.WBTC.address]: wbtcPrice,
     [BTC_DERIVATED_TOKENS.LBTC.address]: lbtcPrice,
     [BTC_DERIVATED_TOKENS.CBBTC.address]: cbtcPrice,
+    [BTC_DERIVATED_TOKENS.EBTC.address]: ebtcPrice,
   };
 
   const tokenDerivedLabels = {
@@ -189,7 +196,9 @@ export function DepositForm({ refetchUserBalance }: Props) {
 
       // 2. Check if public client is connected
       if (!publicClient) {
-        return toast.error("Public client is not connected");
+        return toast.error("Public client is not connected", {
+          descriptionClassName: "!text-neutral-900",
+        });
       }
 
       // 3. Check if the amount is valid
@@ -199,31 +208,43 @@ export function DepositForm({ refetchUserBalance }: Props) {
       const tokenDerivedDecimal = tokenDerivedDecimals[token as `0x${string}`];
 
       if (Number(amount) <= 0) {
-        return toast.error("Amount should be greater than 0");
+        return toast.error("Amount should be greater than 0", {
+          descriptionClassName: "!text-neutral-900",
+        });
       }
 
       if (Number(amount) > Number(tokenDerivedBalance?.formatted)) {
-        return toast.error("Amount is bigger than the token balance");
+        return toast.error("Amount is bigger than the token balance", {
+          descriptionClassName: "!text-neutral-900",
+        });
       }
 
       // 4. Check if the teller is allowing the deposit of the selected token
       if (token === BTC_DERIVATED_TOKENS.WBTC.address && !tokenDerivedAllowDeposit[BTC_DERIVATED_TOKENS.WBTC.address]) {
-        return toast.error("Vault is not allowing wBTC deposits");
+        return toast.error("Vault is not allowing wBTC deposits", {
+          descriptionClassName: "!text-neutral-900",
+        });
       }
 
       if (token === BTC_DERIVATED_TOKENS.LBTC.address && !tokenDerivedAllowDeposit[BTC_DERIVATED_TOKENS.LBTC.address]) {
-        return toast.error("Vault is not allowing lBTC deposits");
+        return toast.error("Vault is not allowing lBTC deposits", {
+          descriptionClassName: "!text-neutral-900",
+        });
       }
 
       if (
         token === BTC_DERIVATED_TOKENS.CBBTC.address &&
         !tokenDerivedAllowDeposit[BTC_DERIVATED_TOKENS.CBBTC.address]
       ) {
-        return toast.error("Vault is not allowing cbBTC deposits");
+        return toast.error("Vault is not allowing cbBTC deposits", {
+          descriptionClassName: "!text-neutral-900",
+        });
       }
 
       if (token === BTC_DERIVATED_TOKENS.EBTC.address && !tokenDerivedAllowDeposit[BTC_DERIVATED_TOKENS.EBTC.address]) {
-        return toast.error("Vault is not allowing eBTC deposits");
+        return toast.error("Vault is not allowing eBTC deposits", {
+          descriptionClassName: "!text-neutral-900",
+        });
       }
 
       // 5. Approve the vault to spend the token
@@ -242,7 +263,7 @@ export function DepositForm({ refetchUserBalance }: Props) {
         loading: "Approving token access...",
         success: "Token access approved successfully",
         error: "Failed to approve token access",
-        descriptionClassName: "text-neutral-950",
+        descriptionClassName: "!text-neutral-900",
       });
 
       await approvalHashPromise;
@@ -263,7 +284,7 @@ export function DepositForm({ refetchUserBalance }: Props) {
         loading: "Depositing tokens to vault...",
         success: "Tokens successfully deposited to vault",
         error: "Failed to deposit tokens to vault",
-        descriptionClassName: "text-neutral-950",
+        descriptionClassName: "!text-neutral-900",
       });
 
       await depositHashPromise;
@@ -292,8 +313,8 @@ export function DepositForm({ refetchUserBalance }: Props) {
       form.reset();
     } catch (error) {
       console.log("\n ~ onSubmit ~ error:", error);
-
       toast.error("Error", {
+        descriptionClassName: "!text-neutral-900",
         description: "An error occurred while depositing the token",
       });
     }
@@ -392,7 +413,7 @@ export function DepositForm({ refetchUserBalance }: Props) {
                       You are depositing{" "}
                       <span className="font-medium">
                         {amountValue} {tokenDerivedLabel}{" "}
-                        {tokenDerivedPrice ? `(~ $${Number(amountValue) * tokenDerivedPrice?.price_usd})` : null}
+                        {tokenDerivedPrice ? `(~ $${Number(amountValue) * tokenDerivedPrice})` : null}
                       </span>{" "}
                       to the vault. Please confirm to continue.
                     </p>

@@ -1,24 +1,42 @@
 import { type UseQueryResult, useQuery } from "@tanstack/react-query";
 import { z } from "zod";
 
+// internals
+import { BTC_DERIVATED_TOKENS } from "../../constants/tokens";
+
+// lib
+import { getAlchemyApiKey } from "@/lib/alchemy";
+
 // schemas
 const lbtcPriceSchema = z.object({
-  price_usd: z.number(),
-  total_supply: z.number(),
-  usd_market_cap: z.number(),
+  data: z.array(
+    z.object({
+      symbol: z.string(),
+      prices: z.array(
+        z.object({
+          currency: z.string(),
+          value: z.string(),
+          lastUpdatedAt: z.string(),
+        }),
+      ),
+    }),
+  ),
 });
 
-// types
-type LbtcPrice = z.infer<typeof lbtcPriceSchema>;
-
-export function useLbtcPrice(): UseQueryResult<LbtcPrice> {
+export function useLbtcPrice(): UseQueryResult<number> {
   return useQuery({
     queryKey: ["lbtc-price"],
     queryFn: async () => {
-      const response = await fetch("https://app.ether.fi/api/pricing/lbtc");
-      const data = await response.json();
+      const response = await fetch(
+        `https://api.g.alchemy.com/prices/v1/${getAlchemyApiKey()}/tokens/by-symbol?symbols=${BTC_DERIVATED_TOKENS.LBTC.label}`,
+      );
 
-      return lbtcPriceSchema.parse(data);
+      const data = await response.json();
+      const parsedData = lbtcPriceSchema.parse(data);
+
+      const price = Number(parsedData.data[0].prices[0].value);
+
+      return price;
     },
   });
 }

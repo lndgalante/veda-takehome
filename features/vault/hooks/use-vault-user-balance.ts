@@ -30,7 +30,7 @@ export function useVaultUserBalance(address: `0x${string}` | undefined) {
   useEffect(
     function debounceVaultUserBalance() {
       const btcValue = getSatoshisToBtc(vaultBalanceOf ?? BigInt(0));
-      const wbtcFiatValue = btcValue * (wbtcPrice?.price_usd ?? 0);
+      const wbtcFiatValue = btcValue * (wbtcPrice ?? 0);
 
       setVaultUserBalanceInBtc(btcValue);
       setVaultUserBalanceInFiat(wbtcFiatValue);

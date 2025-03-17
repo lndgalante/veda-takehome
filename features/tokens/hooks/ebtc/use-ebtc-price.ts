@@ -8,7 +8,7 @@ import { BTC_DERIVATED_TOKENS } from "../../constants/tokens";
 import { getAlchemyApiKey } from "@/lib/alchemy";
 
 // schemas
-const ethPriceSchema = z.object({
+const ebtcPriceSchema = z.object({
   data: z.array(
     z.object({
       symbol: z.string(),
@@ -23,16 +23,16 @@ const ethPriceSchema = z.object({
   ),
 });
 
-export function useEthPrice(): UseQueryResult<number> {
+export function useEbtcPrice(): UseQueryResult<number> {
   return useQuery({
-    queryKey: ["eth-price"],
+    queryKey: ["ebtc-price"],
     queryFn: async () => {
       const response = await fetch(
-        `https://api.g.alchemy.com/prices/v1/${getAlchemyApiKey()}/tokens/by-symbol?symbols=ETH`,
+        `https://api.g.alchemy.com/prices/v1/${getAlchemyApiKey()}/tokens/by-symbol?symbols=${BTC_DERIVATED_TOKENS.EBTC.label}`,
       );
 
       const data = await response.json();
-      const parsedData = ethPriceSchema.parse(data);
+      const parsedData = ebtcPriceSchema.parse(data);
 
       const price = Number(parsedData.data[0].prices[0].value);
 

@@ -28,7 +28,7 @@ export function useVaultTvl() {
   useEffect(
     function debounceWbtcFiatValue() {
       const btcValue = getSatoshisToBtc(vaultTotalSupply ?? BigInt(0));
-      const wbtcFiatValue = btcValue * (wbtcPrice?.price_usd ?? 0);
+      const wbtcFiatValue = btcValue * (wbtcPrice ?? 0);
 
       setWbtcFiatValue(wbtcFiatValue);
     },

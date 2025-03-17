@@ -6,13 +6,16 @@
 
 ## Get Started
 
-
 1. Create a `.env` file from `.env.template`
 ```bash
 cp .env.template .env
 ```
 
-2. Complete `.env` with values (ask the team for those)
+2. Complete `.env` with values (ask for those)
+
+You will only need:
+- Reown Project ID (used in Rainbow Kit)
+- Alchemy API key (For RPC and Price API use)
 
 3. Install Bun (If you haven't yet)
 ```bash
@@ -37,8 +40,8 @@ bun run dev
 - [x] Deposit LBTC, wBTC, cbBTC, or eBTC
 
 ## Follow-up
-- [ ] Great UI/UX
-- [ ] Any other quality of life improvement
+- [x] Great UI/UX
+- [x] Any other quality of life improvement
 
 ## Stack
 - Next.js (with TypeScript)
@@ -53,7 +56,7 @@ bun run dev
 - I display the input amount in red if the value is bigger than the selected token (i.e. user inserts 18 in the input amount but their WBTC balance in 17.2, then the text will be shown in red)
 
 ## Questions for Veda team
-- For the TVL feature I have a final result of `$37.3M` but Ether.fi has a value of `$38.4M`, so I'm a bit worried where that difference is coming from, since I would like that the TVL is as accurate as possible that's why I'm reading the `totalSupply` directly from chain. Is Ether.fi addding something extra, or I'm miscalculating the TVL?
+- For the TVL feature I have a final result of `$36.6M` but Ether.fi has a value of `$37.7M`, so I'm a bit worried where that `~1M` difference is coming from, since I would like that the TVL is as accurate as possible, and that's why I'm reading the `totalSupply` directly from chain. Is Ether.fi addding something extra, or I'm miscalculating the TVL?
 - I haven't used yet the `Accountant` and `Lens` contracts, should those be used in this challenge?
 
 
