@@ -50,6 +50,7 @@ bun run dev
 - For the TVL feature I have a final result of `$37.3M` but Ether.fi has a value of `$38.4M`, so I'm a bit worried where that difference is coming from, since I would like that the TVL is as accurate as possible that's why I'm reading the `totalSupply` directly from chain.
 - I'm using RainbowKit as a third-party wallet connect, on top of wagmi, since IMO is the best UI/UX for connecting wallet, and for a challenge seems a right fit in order to be time-wise. (And also is being used in Veda Labs Tech to maintain consistency).
 - I'm showing the current connected chain, but only in `development mode`, and not in production.
+- I display the input amount in red if the value is bigger than the selected token (i.e. user inserts 18 in the input amount but their WBTC balance in 17.2, then the text will be shown in red)
 
 ---
 

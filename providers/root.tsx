@@ -10,6 +10,7 @@ import { rainbowConfig } from "@/lib/rainbow-kit";
 
 // ui
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { Toaster } from "@/components/ui/sonner";
 
 export function RootProvider({
 	children,
@@ -29,7 +30,10 @@ export function RootProvider({
 						accentColorForeground: "#171717",
 					})}
 				>
-					<TooltipProvider>{children}</TooltipProvider>
+					<TooltipProvider>
+						{children}
+						<Toaster />
+					</TooltipProvider>
 				</RainbowKitProvider>
 			</QueryClientProvider>
 		</WagmiProvider>

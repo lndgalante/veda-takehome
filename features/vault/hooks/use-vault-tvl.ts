@@ -6,9 +6,9 @@ import { useDebounceValue } from "usehooks-ts";
 // internals
 import { useVaultTotalSupply } from "./use-vault-total-supply";
 
-// wbtc
-import { getSatoshisToBtc } from "@/features/prices/utils/units";
-import { useWbtcPrice } from "@/features/prices/hooks/use-wbtc-price";
+// tokens
+import { getSatoshisToBtc } from "@/features/tokens/utils/units";
+import { useWbtcPrice } from "@/features/tokens/hooks/wbtc/use-wbtc-price";
 
 export function useVaultTvl() {
 	// vault hooks

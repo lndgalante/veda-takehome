@@ -5,6 +5,7 @@ import NumberFlow from "@number-flow/react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 // lib
+import { cn } from "@/lib/utils";
 import { isDev } from "@/lib/is-dev";
 
 // ui
@@ -26,7 +27,7 @@ const DEMO_ADDRESS_FOR_TESTING = "0xD50e208b3D89eC1b74303e3365404bD8736E5BA3";
 
 export default function Home() {
 	// wallet hooks
-	const { address } = useAccount();
+	const { address, isConnected } = useAccount();
 
 	// vault hooks
 	const {
@@ -41,6 +42,7 @@ export default function Home() {
 		isLoading: isLoadingApy,
 	} = useVaultApyPercentage();
 
+	// TODO: Remember to replace the DEMO_ADDRESS_FOR_TESTING with the user's address
 	const {
 		data: userBalance,
 		error: errorUserBalance,
@@ -138,57 +140,60 @@ export default function Home() {
 				</article>
 			</section>
 
-			{address ? (
-				<section className="flex flex-row gap-3 items-center h-[40px] text-neutral-50 text-2xl font-semibold">
-					<article className="flex items-center gap-2">
+			<section
+				className={cn(
+					"flex flex-row gap-3 items-center h-[40px] text-neutral-50 text-2xl font-semibold mb-4 transition-opacity duration-300",
+					isConnected ? "opacity-100" : "opacity-0",
+				)}
+			>
+				<article className="flex items-center gap-2">
+					<Tooltip>
+						<TooltipTrigger asChild>
+							<span>Vault Balance</span>
+						</TooltipTrigger>
+						<TooltipContent side="bottom">
+							<p>Amount of liquidBTC you own</p>
+						</TooltipContent>
+					</Tooltip>
+
+					{isLoadingUserBalance ? (
+						<div className="flex flex-row gap-2">
+							<Skeleton className="w-[80px] h-[30px] rounded-sm" />
+						</div>
+					) : null}
+
+					{errorUserBalance ? (
 						<Tooltip>
 							<TooltipTrigger asChild>
-								<span>Vault Balance</span>
+								<span>Error</span>
 							</TooltipTrigger>
 							<TooltipContent side="bottom">
-								<p>Amount of liquidBTC you own</p>
+								<p>Try again later</p>
 							</TooltipContent>
 						</Tooltip>
+					) : null}
 
-						{isLoadingUserBalance ? (
-							<div className="flex flex-row gap-2">
-								<Skeleton className="w-[80px] h-[30px] rounded-sm" />
-							</div>
-						) : null}
-
-						{errorUserBalance ? (
-							<Tooltip>
-								<TooltipTrigger asChild>
-									<span>Error</span>
-								</TooltipTrigger>
-								<TooltipContent side="bottom">
-									<p>Try again later</p>
-								</TooltipContent>
-							</Tooltip>
-						) : null}
-
-						{!isLoadingUserBalance && !errorUserBalance ? (
-							<Tooltip>
-								<TooltipTrigger asChild>
-									<NumberFlow
-										willChange
-										value={userBalance.fiat}
-										format={{ style: "currency", currency: "USD" }}
-									/>
-								</TooltipTrigger>
-								<TooltipContent side="bottom">
-									<NumberFlow
-										willChange
-										value={userBalance.btc}
-										format={{ maximumFractionDigits: 8 }}
-										prefix="₿"
-									/>
-								</TooltipContent>
-							</Tooltip>
-						) : null}
-					</article>
-				</section>
-			) : null}
+					{!isLoadingUserBalance && !errorUserBalance ? (
+						<Tooltip>
+							<TooltipTrigger asChild>
+								<NumberFlow
+									willChange
+									value={userBalance.fiat}
+									format={{ style: "currency", currency: "USD" }}
+								/>
+							</TooltipTrigger>
+							<TooltipContent side="bottom">
+								<NumberFlow
+									willChange
+									value={userBalance.btc}
+									format={{ maximumFractionDigits: 8 }}
+									prefix="₿"
+								/>
+							</TooltipContent>
+						</Tooltip>
+					) : null}
+				</article>
+			</section>
 
 			<DepositForm />
 		</main>
