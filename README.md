@@ -1,10 +1,10 @@
 # Veda Labs - Task Home
 
-# Play with it now!
+## Play with it now!
 
-> LINK TBD
+[Vercel Deployment Link](https://veda-vault.vercel.app/)
 
-# Get Started
+## Get Started
 
 
 1. Create a `.env` file from `.env.template`
@@ -29,23 +29,23 @@ bun install
 bun run dev
 ```
 
-# Requeriments
+## Requeriments
 - [x] See the overall TVL of the vault in USD
 - [x] View the current APY of the vault
 - [x] Connect their (ethereum) wallet
 - [x] View their current balance in the vault in USD
 - [x] Deposit LBTC, wBTC, cbBTC, or eBTC
 
-# Follow-up
+## Follow-up
 - [ ] Great UI/UX
 - [ ] Any other quality of life improvement
 
-# Stack
+## Stack
 - Next.js (with TypeScript)
 - Shadcn/ui (with Tailwind)
 - WAGMI (with Viem)
 
-# Notes
+## Notes
 
 - Based on the time I had since I started on a Saturday, I follow an approach where I wanted to give a balanced quality of code and UI/UX.
 - For the TVL feature I have a final result of `$37.3M` but Ether.fi has a value of `$38.4M`, so I'm a bit worried where that difference is coming from, since I would like that the TVL is as accurate as possible that's why I'm reading the `totalSupply` directly from chain.
@@ -58,7 +58,7 @@ bun run dev
 # Take Home Assignment
 The goal of this assignment is to implement a simple landing page for one of our vaults, Liquid BTC. An example front end can be found on EtherFi’s website at https://app.ether.fi/liquid/btc
 
-# Goals
+## Goals
 Everyone should be able to:
 * See the overall TVL of the vault in USD
 * View the current APY of the vault
@@ -70,10 +70,10 @@ A user should be able to:
 
 Feel free to add QOL items and more features as you wish for a great UX. Your focus should be on correctly implementing the above requirements, and having a solid UI that feels good to use while maintaining best coding practices.
 
-# Frameworks
+## Frameworks
 Please use NextJs and TypeScript. Outside of that feel free to use anything you’d like.
 
-# Details
+## Details
 You will need the following addresses:
 
 Vault: 0x5f46d540b6eD704C3c8789105F30E075AA900726
