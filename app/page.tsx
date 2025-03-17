@@ -42,8 +42,14 @@ export default function Home() {
 	const {
 		data: userBalance,
 		error: errorUserBalance,
+		refetch: refetchUserBalance,
 		isLoading: isLoadingUserBalance,
 	} = useVaultUserBalance(address);
+
+	// helper
+	function handleRefetchUserBalance() {
+		refetchUserBalance();
+	}
 
 	return (
 		<main className="container mx-auto px-4 py-8">
@@ -191,7 +197,7 @@ export default function Home() {
 				</article>
 			</section>
 
-			<DepositForm />
+			<DepositForm refetchUserBalance={handleRefetchUserBalance} />
 		</main>
 	);
 }

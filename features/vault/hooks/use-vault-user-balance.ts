@@ -15,6 +15,7 @@ export function useVaultUserBalance(address: `0x${string}` | undefined) {
 	const {
 		data: vaultBalanceOf,
 		error: errorVaultBalanceOf,
+		refetch: refetchVaultBalanceOf,
 		isLoading: isLoadingVaultBalanceOf,
 	} = useVaultBalanceOf(address);
 
@@ -59,6 +60,7 @@ export function useVaultUserBalance(address: `0x${string}` | undefined) {
 	return {
 		error: errorBalance,
 		isLoading: isLoadingBalance,
+		refetch: refetchVaultBalanceOf,
 		data: {
 			btc: vaultUserBalanceInBtc,
 			fiat: vaultUserBalanceInFiat,

@@ -79,7 +79,9 @@ const formSchema = z.object({
 const WBTC_DEMO_ADDRESS_FOR_TESTING =
 	"0x2078f336Fdd260f708BEc4a20c82b063274E1b23";
 
-export function DepositForm() {
+export function DepositForm({
+	refetchUserBalance,
+}: { refetchUserBalance: () => void }) {
 	// wagmi hooks
 	const publicClient = usePublicClient();
 	const { address: walletAddress, isConnected: isWalletConnected } =
@@ -270,6 +272,7 @@ export function DepositForm() {
 
 			await depositHashPromise;
 
+			// 9. Refetch BTC derived token balances
 			if (token === BTC_DERIVATED_TOKENS.WBTC.address) {
 				refetchWbtcBalance();
 			}
@@ -286,6 +289,10 @@ export function DepositForm() {
 				refetchEbtcBalance();
 			}
 
+			// 10. Refetch user balance
+			refetchUserBalance();
+
+			// 11. Reset form
 			form.reset();
 		} catch (error) {
 			console.log("\n ~ onSubmit ~ error:", error);
