@@ -6,9 +6,9 @@ import { BORING_VAULT_ADDRESS } from "../constants/boring-vault";
 import { useVaultPerformance } from "./use-vault-performance";
 
 // types
-type BreakdownApy = {
-  realApy: number;
-  maturityApy: number;
+type BreakdownApyPercentages = {
+  realApy: string;
+  maturityApy: string;
 };
 
 export function useVaultApy() {
@@ -20,9 +20,9 @@ export function useVaultApy() {
   } = useVaultPerformance(BORING_VAULT_ADDRESS);
 
   // react hooks
-  const [breakdownApyPercentages, setBreakdownApyPercentages] = useState<BreakdownApy>({
-    realApy: 0,
-    maturityApy: 0,
+  const [breakdownApyPercentages, setBreakdownApyPercentages] = useState<BreakdownApyPercentages>({
+    realApy: "0",
+    maturityApy: "0",
   });
 
   // debounce hooks
@@ -44,8 +44,8 @@ export function useVaultApy() {
 
       setTotalApy(combinedApy);
       setBreakdownApyPercentages({
-        realApy: Number((realApy * 100).toFixed(2)),
-        maturityApy: Number((maturityApy * 100).toFixed(2)),
+        realApy: (realApy * 100).toFixed(2),
+        maturityApy: (maturityApy * 100).toFixed(2),
       });
     },
     [vaultPerformance, setTotalApy],
