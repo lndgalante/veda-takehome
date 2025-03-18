@@ -147,10 +147,10 @@ export default function Home() {
         <article className="flex items-center gap-2">
           <Tooltip>
             <TooltipTrigger asChild>
-              <span>Your Balance:</span>
+              <span>Your Vault Balance:</span>
             </TooltipTrigger>
             <TooltipContent side="bottom">
-              <p>Amount of liquidBTC you own</p>
+              <p>Net value of assets in the strategy.</p>
             </TooltipContent>
           </Tooltip>
 

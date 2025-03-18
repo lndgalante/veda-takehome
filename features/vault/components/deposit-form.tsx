@@ -418,16 +418,15 @@ export function DepositForm({ refetchUserBalance }: Props) {
                 <DialogDescription asChild>
                   <div className="space-y-2">
                     <p>
-                      You are depositing{" "}
+                      Depositing{" "}
                       <span className="font-medium">
                         {amountValue} {tokenDerivedLabel}{" "}
-                        {tokenDerivedPrice ? `(~ $${Number(amountValue) * tokenDerivedPrice})` : null}
+                        {tokenDerivedPrice ? `(~ $${(Number(amountValue) * tokenDerivedPrice).toFixed(4)})` : null}
                       </span>{" "}
-                      to the vault. Please confirm to continue.
+                      to vault.
                     </p>
-                    <p>This action cannot be undone. This will permanently deposit the selected token to the vault.</p>
-                    <p>You will have to confirm 2 transactions, one for the approval and one for the deposit.</p>
-                    <p>Please be patient, as the whole process may take around a 1 minute to complete.</p>
+                    <p>This action is permanent and requires 2 transactions.</p>
+                    <p>Process may take up to 1 minute.</p>
                   </div>
                 </DialogDescription>
               </DialogHeader>
