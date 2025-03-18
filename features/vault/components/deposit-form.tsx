@@ -5,10 +5,10 @@ import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { useReward } from "react-rewards";
 import { toast } from "sonner";
 import { useAccount, usePublicClient } from "wagmi";
 import { z } from "zod";
-import { useReward } from "react-rewards";
 
 // lib
 import { cn } from "@/lib/utils";
