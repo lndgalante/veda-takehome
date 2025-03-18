@@ -14,7 +14,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 
 // vault
 import { DepositForm } from "@/features/vault/components/deposit-form";
-import { useVaultApyPercentage } from "@/features/vault/hooks/use-vault-apy";
+import { useVaultApy } from "@/features/vault/hooks/use-vault-apy";
 import { useVaultTvl } from "@/features/vault/hooks/use-vault-tvl";
 import { useVaultUserBalance } from "@/features/vault/hooks/use-vault-user-balance";
 
@@ -25,7 +25,7 @@ export default function Home() {
   // vault hooks
   const { data: tvlData, error: errorTvl, isLoading: isLoadingTvl } = useVaultTvl();
 
-  const { data: apyData, error: errorApy, isLoading: isLoadingApy } = useVaultApyPercentage();
+  const { data: apyData, error: errorApy, isLoading: isLoadingApy } = useVaultApy();
 
   const {
     data: userBalance,
@@ -110,12 +110,30 @@ export default function Home() {
           ) : null}
 
           {!isLoadingApy && !errorApy ? (
-            <NumberFlow
-              willChange
-              value={apyData}
-              format={{ style: "percent", maximumFractionDigits: 1 }}
-              className="w-[54px] h-full"
-            />
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <NumberFlow
+                  willChange
+                  value={apyData.totalApy}
+                  format={{ style: "percent", maximumFractionDigits: 1 }}
+                  className="w-[54px] h-full"
+                />
+              </TooltipTrigger>
+              <TooltipContent side="bottom" className="flex flex-col gap-2">
+                <div>
+                  <p className="font-semibold text-sm">{apyData.breakdownApyPercentages.realApy}% Variable Yield Avg</p>
+                  <p className="text-neutral-600 text-xs">Earned through vault shares</p>
+                </div>
+                <div>
+                  <p className="font-semibold text-sm">
+                    {apyData.breakdownApyPercentages.maturityApy}% Fixed Yield Avg
+                  </p>
+                  <p className="text-neutral-600 text-xs">
+                    Earned through vault shares at time of position maturity date
+                  </p>
+                </div>
+              </TooltipContent>
+            </Tooltip>
           ) : null}
         </article>
       </section>
